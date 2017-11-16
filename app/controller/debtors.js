@@ -166,23 +166,30 @@ var updateDebtor = (req, res) => {
 
     workflow.on('updateDebtor', () => {
         db.debtors.findById(id).then(debtor => {
-            debtor.update({
-                name: name,
-                phonenumber: phonenumber,
-                address: address,
-                district: district,
-                firstdebit: firstdebit
-            }).then((data) => {
-                res.status(200);
-                return res.json(data.get({plain: true}));
-            }).catch((error) => {
-                res.status(500);
-                return res.json({
-                    errors: error,
-                    stackError: error.stack
+            db.details.findAll({where: {debtor_id: debtorId}}).then(details => {
+                if (details.length && debtor.firstdebit !== firstdebit) {
+                    errors.push('Cannot change First Debit.');
+                    workflow.emit('errors', errors);
+                }
+            }).then(() => {
+                debtor.update({
+                    name: name,
+                    phonenumber: phonenumber,
+                    address: address,
+                    district: district,
+                    firstdebit: firstdebit
+                }).then((data) => {
+                    res.status(200);
+                    return res.json(data.get({plain: true}));
                 });
             });
-        });
+        }).catch((error) => {
+            res.status(500);
+            return res.json({
+                errors: error,
+                stackError: error.stack
+            });
+        });;
     });
 
     workflow.emit('validateParams');
@@ -215,7 +222,13 @@ var deleteDebtor = (req, res) => {
 
     workflow.on('deleteDebtor', () => {
         db.debtors.findById(id).then(debtor => {
-            debtor.destroy();
+            db.details.findAll({where: {debtor_id: id}}).then(details => {
+                for(let i=0; i<details.length; i++){
+                    details[i].destroy();
+                };
+            }).then(() => {
+                debtor.destroy();
+            });
         }).then(() => {
             res.status(200);
             return res.json();
@@ -225,7 +238,7 @@ var deleteDebtor = (req, res) => {
                 errors: error,
                 stackError: error.stack
             });
-        });
+        });;
     });
 
     workflow.emit('validateParams');
