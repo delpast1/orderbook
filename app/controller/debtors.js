@@ -177,7 +177,8 @@ var updateDebtor = (req, res) => {
                     phonenumber: phonenumber,
                     address: address,
                     district: district,
-                    firstdebit: firstdebit
+                    firstdebit: firstdebit,
+                    currentdebit: firstdebit
                 }).then((data) => {
                     res.status(200);
                     return res.json(data.get({plain: true}));
