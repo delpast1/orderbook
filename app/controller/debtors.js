@@ -167,7 +167,9 @@ var updateDebtor = (req, res) => {
     workflow.on('updateDebtor', () => {
         db.debtors.findById(id).then(debtor => {
             db.details.findAll({where: {debtor_id: id}}).then(details => {
-                if (details.length && debtor.firstdebit !== firstdebit) {
+                console.log(debtor.firstdebit);
+                console.log(firstdebit);
+                if (details.length && debtor.firstdebit != firstdebit) {
                     errors.push('Cannot change First Debit.');
                     workflow.emit('errors', errors);
                 } else {
@@ -181,7 +183,13 @@ var updateDebtor = (req, res) => {
                     }).then((data) => {
                         res.status(200);
                         return res.json(data.get({plain: true}));
-                    });
+                    }).catch((error) => {
+                        res.status(500);
+                        return res.json({
+                            errors: error,
+                            stackError: error.stack
+                        });
+                    });;
                 }
             });
         }).catch((error) => {
@@ -190,7 +198,7 @@ var updateDebtor = (req, res) => {
                 errors: error,
                 stackError: error.stack
             });
-        });;
+        });
     });
 
     workflow.emit('validateParams');

@@ -33,7 +33,11 @@ var addDetail = (req, res) => {
 
     workflow.on('addDetail', () => {
         db.debtors.findById(debtorId).then(debtor => {
-            if (debtor.currentdebit < Math.abs(amount) && amount < 0) {
+            if (!debtor){
+                errors.push('Debtor không tồn tại.');
+                workflow.emit('errors', errors);
+            }
+            else if (debtor.currentdebit < Math.abs(amount) && amount < 0) {
                 errors.push('Số tiền trả cao hơn số tiền nợ.');
                 workflow.emit('errors', errors);
             } else {
