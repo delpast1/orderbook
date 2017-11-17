@@ -170,27 +170,27 @@ var updateDebtor = (req, res) => {
                 if (details.length && debtor.firstdebit !== firstdebit) {
                     errors.push('Cannot change First Debit.');
                     workflow.emit('errors', errors);
+                } else {
+                    debtor.update({
+                        name: name,
+                        phonenumber: phonenumber,
+                        address: address,
+                        district: district,
+                        firstdebit: firstdebit,
+                        currentdebit: firstdebit
+                    }).then((data) => {
+                        res.status(200);
+                        return res.json(data.get({plain: true}));
+                    });
                 }
-            }).then(() => {
-                debtor.update({
-                    name: name,
-                    phonenumber: phonenumber,
-                    address: address,
-                    district: district,
-                    firstdebit: firstdebit,
-                    currentdebit: firstdebit
-                }).then((data) => {
-                    res.status(200);
-                    return res.json(data.get({plain: true}));
-                });
-            }).catch((error) => {
-                res.status(500);
-                return res.json({
-                    errors: error,
-                    stackError: error.stack
-                });
             });
-        });
+        }).catch((error) => {
+            res.status(500);
+            return res.json({
+                errors: error,
+                stackError: error.stack
+            });
+        });;
     });
 
     workflow.emit('validateParams');
