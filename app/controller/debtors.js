@@ -166,7 +166,7 @@ var updateDebtor = (req, res) => {
 
     workflow.on('updateDebtor', () => {
         db.debtors.findById(id).then(debtor => {
-            db.details.findAll({where: {debtor_id: debtorId}}).then(details => {
+            db.details.findAll({where: {debtor_id: id}}).then(details => {
                 if (details.length && debtor.firstdebit !== firstdebit) {
                     errors.push('Cannot change First Debit.');
                     workflow.emit('errors', errors);
