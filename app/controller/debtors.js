@@ -183,14 +183,14 @@ var updateDebtor = (req, res) => {
                     res.status(200);
                     return res.json(data.get({plain: true}));
                 });
+            }).catch((error) => {
+                res.status(500);
+                return res.json({
+                    errors: error,
+                    stackError: error.stack
+                });
             });
-        }).catch((error) => {
-            res.status(500);
-            return res.json({
-                errors: error,
-                stackError: error.stack
-            });
-        });;
+        });
     });
 
     workflow.emit('validateParams');
